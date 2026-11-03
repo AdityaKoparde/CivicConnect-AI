@@ -1,0 +1,11 @@
+{
+  "name": "civicconnect-ai-service",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CivicConnect AI Python service (FastAPI) — npm wrapper so root scripts can drive dev/test",
+  "scripts": {
+    "dev": "./.venv/bin/uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
+    "start": "./.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000",
+    "test": "./.venv/bin/python -m pytest"
+  }
+}
