@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+!.env.*.example
+
+# Local database (portable PostgreSQL)
+.pg/
+
+# Logs & runtime
+*.log
+logs/
+coverage/
+
+# Uploaded files
+uploads/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

@@ -1,0 +1,18 @@
+{
+  "name": "civicconnect-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CivicConnect AI - Multilingual citizen grievance chatbot platform for Karnataka",
+  "scripts": {
+    "dev": "concurrently -k -n backend,ai,frontend -c blue,magenta,green \"npm run dev --prefix backend\" \"npm run dev --prefix ai-service\" \"npm run dev --prefix frontend\"",
+    "build": "npm run build --prefix backend && npm run build --prefix frontend",
+    "test": "npm run test --prefix ai-service && npm run test --prefix backend && npm run test --prefix frontend",
+    "db:setup": "node backend/scripts/ensure-db.mjs && npm run db:migrate --prefix backend && npm run db:seed --prefix backend",
+    "db:migrate": "npm run db:migrate --prefix backend",
+    "db:seed": "npm run db:seed --prefix backend",
+    "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend && python3 -m venv ai-service/.venv && ai-service/.venv/bin/pip install -r ai-service/requirements.txt"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
