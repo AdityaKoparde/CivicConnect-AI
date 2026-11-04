@@ -26,7 +26,9 @@ export interface RequestOptions {
 
 export async function api<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   const { method = 'GET', body, query } = opts;
-  const url = new URL(BASE + path);
+  // BASE may be absolute (http://api.example.org/api) or relative (/api when the
+  // UI is served same-origin behind nginx); the origin base makes both work.
+  const url = new URL(BASE + path, window.location.origin);
   if (query) {
     for (const [k, v] of Object.entries(query)) {
       if (v !== undefined && v !== null && v !== '') url.searchParams.set(k, String(v));

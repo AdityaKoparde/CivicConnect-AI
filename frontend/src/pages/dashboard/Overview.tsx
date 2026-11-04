@@ -81,7 +81,6 @@ export default function Overview() {
           </h1>
           <p className="text-sm text-slate-500">
             {user?.departmentName ?? 'All departments'} · role-scoped analytics
-            {stats.isDemoData ? ' · demo data' : ''}
           </p>
         </div>
         <Link to="/dashboard/complaints" className="btn-primary">

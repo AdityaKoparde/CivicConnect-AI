@@ -117,12 +117,16 @@ export default function Officers() {
                 {items.map((o) => (
                   <tr key={o.id} className="hover:bg-slate-50">
                     <td className="px-3 py-2.5 font-medium text-slate-800">{o.name}</td>
-                    <td className="px-3 py-2.5 text-slate-600">{o.email}</td>
+                    <td className="px-3 py-2.5 text-slate-600">
+                      <span className="block max-w-[190px] truncate" title={o.email}>
+                        {o.email}
+                      </span>
+                    </td>
                     <td className="px-3 py-2.5 text-xs font-semibold uppercase text-slate-500">
                       {o.role.replace('DEPARTMENT_', '').replace('_', ' ')}
                     </td>
                     <td className="px-3 py-2.5 text-slate-600">{o.departmentName ?? '—'}</td>
-                    <td className="px-3 py-2.5">
+                    <td className="whitespace-nowrap px-3 py-2.5">
                       <span
                         className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${
                           o.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
@@ -131,7 +135,7 @@ export default function Officers() {
                         {o.isActive ? 'active' : 'disabled'}
                       </span>
                     </td>
-                    <td className="px-3 py-2.5 text-right">
+                    <td className="whitespace-nowrap px-3 py-2.5 text-right">
                       <button
                         type="button"
                         disabled={busy || o.id === user?.id}
