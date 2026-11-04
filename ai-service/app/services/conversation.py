@@ -84,22 +84,36 @@ class AIConversationService:
 
         # ---- 1. understand this message (cloud if configured, else demo) ----
         und = await understanding_service.understand_with_cloud(msg, lang)
-        und = self._merge_understanding(state.understanding, und)
+        # A message whose only content is a place ("near the bus stand") must not
+        # be read as a new complaint category.
+        place_only = bool(
+            und.entities.district or und.entities.city or und.entities.taluk
+            or und.entities.ward or und.entities.landmark
+        ) and not und.entities.problem_type
+        und = self._merge_understanding(state.understanding, und, lock_category=place_only)
 
         # ---- 2. merge extracted information into slots ----
         self._merge_entities(slots, und.entities)
+        substantive = self._is_substantive(msg, folded)
         if und.category != "other":
-            slots["category"] = und.category
+            # The first reasoned category wins: answering "where?" with
+            # "near the bus stand" must not retag a water complaint as public
+            # transport. Only an unset/"other" category is upgraded.
+            if slots.get("category") in (None, "", "other"):
+                slots["category"] = und.category
         elif "category" not in slots:
             slots["category"] = None  # unknown for now
-        slots["summary"] = und.normalized_description
-        if _PRIORITY_RANK[und.priority] >= _PRIORITY_RANK.get(str(slots.get("priority", "low")), 0):
-            slots["priority"] = und.priority
 
-        # description: first substantive message wins
-        substantive = self._is_substantive(msg, folded)
+        # description and summary come from the complaint itself, never from a
+        # later "where?" answer
         if substantive and not slots.get("description"):
             slots["description"] = msg[:1000]
+            slots["summary"] = und.normalized_description
+        elif not slots.get("summary"):
+            slots["summary"] = und.normalized_description
+
+        if _PRIORITY_RANK[und.priority] >= _PRIORITY_RANK.get(str(slots.get("priority", "low")), 0):
+            slots["priority"] = und.priority
 
         # Node-provided device location label can serve as a landmark
         loc = slots.get("location")
@@ -444,7 +458,9 @@ class AIConversationService:
         return not all(t in greet_set for t in tokens)
 
     @staticmethod
-    def _merge_understanding(prev: AIUnderstanding | None, curr: AIUnderstanding) -> AIUnderstanding:
+    def _merge_understanding(
+        prev: AIUnderstanding | None, curr: AIUnderstanding, lock_category: bool = False
+    ) -> AIUnderstanding:
         if prev is None:
             return curr
         if curr.category == "other" and prev.category != "other":
@@ -463,6 +479,10 @@ class AIConversationService:
                 curr.classification_method.startswith("rules")
                 and curr.confidence >= 0.65
             )
+            # A pure location answer ("near the bus stand") reports whereabouts,
+            # not a new problem: it may not re-route an established complaint.
+            if lock_category and prev.category != "other":
+                strong = False
             merged = curr.model_copy(deep=True) if strong else prev.model_copy(deep=True)
         # …but entities from the NEW message always get first refusal:
         # current non-null values override, previous values survive otherwise.

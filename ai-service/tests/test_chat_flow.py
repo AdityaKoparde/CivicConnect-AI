@@ -115,6 +115,15 @@ def test_no_reasking_known_info(client, headers):
     assert j2["next_action"] != "ASK_LOCATION"
 
 
+def test_location_answer_does_not_retag_category(client, headers):
+    """Answering "where?" with a landmark must not reclassify the complaint."""
+    j = turn(client, headers, "ನನ್ನ ಏರಿಯಾದಲ್ಲಿ ನೀರಿನ ಸಮಸ್ಯೆ ಇದೆ")
+    assert j["understanding"]["category"] == "water_supply"
+    j2 = turn(client, headers, "ಬಸ್ ನಿಲ್ದಾಣದ ಹತ್ತಿರ, ಬೆಂಗಳೂರು", j["state"])
+    assert j2["slots"]["category"] == "water_supply"
+    assert "Public Transport" not in (j2.get("confirmation_summary") or "")
+
+
 def test_negative_answer_returns_to_editing(client, headers):
     j = turn(client, headers, "There is a huge pothole near my college main gate, ward 12 in Mysuru.")
     if j["next_action"] == "ASK_CONFIRM":

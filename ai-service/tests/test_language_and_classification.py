@@ -33,6 +33,14 @@ def test_classifier_trained():
     assert classification_service.trained
 
 
+def test_classify_kannada_water_issue_phrasing():
+    """"water problem in my area" — genitive ನೀರಿನ, not just ನೀರು ಬರುತ್ತಿಲ್ಲ."""
+    classification_service.train()
+    res = classification_service.classify("ನನ್ನ ಏರಿಯಾದಲ್ಲಿ ನೀರಿನ ಸಮಸ್ಯೆ ಇದೆ")
+    assert res.category == "water_supply"
+    assert res.confidence >= 0.6
+
+
 def test_classify_english_pothole():
     res = classification_service.classify("There is a huge pothole near my college in Mysuru.")
     assert res.category == "road_damage"
