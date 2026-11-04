@@ -214,7 +214,7 @@ interface UserSeed {
 }
 
 const USERS: UserSeed[] = [
-  { email: 'admin@civicconnect.demo', name: 'Demo Super Admin', role: 'SUPER_ADMIN' },
+  { email: 'admin@civicconnect.demo', name: 'Ananya Rao', role: 'SUPER_ADMIN' },
   { email: 'triage@civicconnect.demo', name: 'Triage Desk Lead', role: 'DEPARTMENT_ADMIN', deptCode: 'CIVIC-TRIAGE' },
   { email: 'bbmp@civicconnect.demo', name: 'BBMP Ward Officer', role: 'DEPARTMENT_ADMIN', deptCode: 'BBMP' },
   { email: 'roads@civicconnect.demo', name: 'PWD Road Engineer', role: 'DEPARTMENT_OFFICER', deptCode: 'PWD' },

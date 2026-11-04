@@ -581,12 +581,19 @@ export async function trackComplaint(input: {
       at: u.createdAt,
       byRole: u.actor?.role ?? 'SYSTEM',
     }));
-  statusHistory.unshift({
-    status: 'SUBMITTED',
-    note: null,
-    at: complaint.createdAt,
-    byRole: 'SYSTEM',
-  });
+  // Complaints registered through chat already log their own SUBMITTED entry;
+  // only add the baseline row when nothing recorded the submission.
+  const hasSubmittedEntry = updates.some(
+    (u) => u.kind === 'STATUS' && u.toStatus === 'SUBMITTED',
+  );
+  if (!hasSubmittedEntry) {
+    statusHistory.unshift({
+      status: 'SUBMITTED',
+      note: null,
+      at: complaint.createdAt,
+      byRole: 'SYSTEM',
+    });
+  }
 
   const publicUpdates = updates
     .filter((u): u is typeof u & { note: string } =>
